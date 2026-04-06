@@ -1,0 +1,39 @@
+# Entorno virtual
+venv/
+env/
+.venv/
+
+# Variables de entorno
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+
+# Distribución / empaquetado
+dist/
+build/
+*.egg-info/
+
+# pytest
+.pytest_cache/
+htmlcov/
+.coverage
+
+# IDEs
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Alembic (solo versiones, no la config)
+alembic/versions/*.pyc
+
+# Sistema operativo
+.DS_Store
+Thumbs.db

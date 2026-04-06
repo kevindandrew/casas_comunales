@@ -1,0 +1,37 @@
+{
+  "eval_id": 1,
+  "configuration": "without_skill",
+  "expectations": [
+    {
+      "text": "Genera los 3 archivos: model, schema y router",
+      "passed": true,
+      "evidence": "Contiene los 3 archivos"
+    },
+    {
+      "text": "El modelo usa nullable=False/True correctamente y ForeignKey a participantes y talleres",
+      "passed": false,
+      "evidence": "Todos los campos sin nullable especificado, usa Float en lugar de Numeric(10,2)"
+    },
+    {
+      "text": "Schema tiene PagoCreate, PagoUpdate y PagoRead con ConfigDict(from_attributes=True)",
+      "passed": false,
+      "evidence": "No hay PagoUpdate. Usa class Config: orm_mode=True (Pydantic v1, deprecado en v2)"
+    },
+    {
+      "text": "Router filtra por casa_comunal para el facilitador",
+      "passed": false,
+      "evidence": "GET /pagos devuelve todos los pagos sin distinción de rol"
+    },
+    {
+      "text": "Endpoint de creación solo accesible por admin",
+      "passed": false,
+      "evidence": "POST /pagos usa get_current_user, cualquier usuario autenticado puede crear"
+    },
+    {
+      "text": "Resumen indica qué modificar en main.py y __init__.py",
+      "passed": false,
+      "evidence": "Menciona main.py pero omite models/__init__.py. No incluye código exacto"
+    }
+  ],
+  "pass_rate": 0.167
+}

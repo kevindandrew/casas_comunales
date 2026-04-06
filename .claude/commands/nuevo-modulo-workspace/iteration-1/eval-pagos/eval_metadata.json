@@ -1,0 +1,31 @@
+{
+  "eval_id": 1,
+  "eval_name": "crear-modulo-pagos",
+  "prompt": "Quiero agregar un módulo de pagos con monto, fecha_pago, metodo_pago, relacionado con participante y taller. Admin ve todos, facilitador solo su casa.",
+  "assertions": [
+    {
+      "text": "Genera los 3 archivos necesarios: model, schema y router",
+      "check": "Los outputs contienen models_pago.py, schemas_pago.py y routers_pagos.py"
+    },
+    {
+      "text": "El modelo usa nullable=True en campos opcionales y ForeignKey correctamente",
+      "check": "models_pago.py contiene ForeignKey a participantes y talleres"
+    },
+    {
+      "text": "El schema tiene las 3 clases: Create, Update y Read con ConfigDict",
+      "check": "schemas_pago.py contiene PagoCreate, PagoUpdate y PagoRead con from_attributes=True"
+    },
+    {
+      "text": "El router filtra por casa_comunal del facilitador",
+      "check": "routers_pagos.py filtra por current_user.casa_comunal_id cuando rol es Facilitador"
+    },
+    {
+      "text": "El endpoint de listado usa require_admin o filtra según rol",
+      "check": "GET /pagos tiene lógica de control de acceso diferenciada"
+    },
+    {
+      "text": "El resumen indica qué modificar en main.py y __init__.py",
+      "check": "resumen.md menciona include_router y el import del modelo"
+    }
+  ]
+}

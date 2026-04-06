@@ -1,0 +1,17 @@
+{
+  "skill_name": "nuevo-modulo",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Quiero agregar un módulo de pagos. Cada pago tiene: monto (decimal), fecha_pago (date), metodo_pago (efectivo o transferencia), y se relaciona con un participante y un taller. Solo el admin puede listar todos los pagos. El facilitador solo ve los pagos de su casa comunal.",
+      "expected_output": "Debe crear models/pago.py, schemas/pago.py, routers/pagos.py, actualizar models/__init__.py y main.py. El router debe tener GET /pagos, POST /pagos, GET /pagos/{id}. El facilitador debe ver solo pagos filtrados por su casa.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "necesito una tabla para sugerencias de participantes. campos: descripcion (texto), estado (pendiente/resuelto), participante_id. cualquiera puede crear, solo admin puede cambiar el estado.",
+      "expected_output": "Debe crear los 3 archivos (model, schema, router), registrar en main.py. El endpoint PATCH /sugerencias/{id}/resolver debe tener require_admin. POST /sugerencias accesible para todos los autenticados.",
+      "files": []
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "eval_id": 1,
+  "configuration": "with_skill",
+  "expectations": [
+    {
+      "text": "Genera los 3 archivos: model, schema y router",
+      "passed": true,
+      "evidence": "Contiene models_pago.py, schemas_pago.py y routers_pagos.py"
+    },
+    {
+      "text": "El modelo usa nullable=False/True correctamente y ForeignKey a participantes y talleres",
+      "passed": true,
+      "evidence": "monto y fecha_pago son nullable=False, ForeignKeys a participantes y talleres presentes"
+    },
+    {
+      "text": "Schema tiene PagoCreate, PagoUpdate y PagoRead con ConfigDict(from_attributes=True)",
+      "passed": true,
+      "evidence": "Las 3 clases presentes, PagoRead usa model_config = ConfigDict(from_attributes=True)"
+    },
+    {
+      "text": "Router filtra por casa_comunal para el facilitador",
+      "passed": true,
+      "evidence": "Subconsulta filtra talleres por casa_comunal_id del facilitador"
+    },
+    {
+      "text": "Endpoint de creación solo accesible por admin",
+      "passed": true,
+      "evidence": "POST /pagos usa require_admin"
+    },
+    {
+      "text": "Resumen indica qué modificar en main.py y __init__.py",
+      "passed": true,
+      "evidence": "resumen.md documenta los 2 cambios necesarios con código exacto"
+    }
+  ],
+  "pass_rate": 1.0
+}

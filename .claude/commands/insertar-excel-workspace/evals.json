@@ -1,0 +1,17 @@
+{
+  "skill_name": "insertar-excel",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Tengo un Excel con participantes del sistema anterior. El archivo está en C:/Users/KEVIN/Desktop/participantes_migracion.xlsx. Quiero cargarlo a la base de datos.",
+      "expected_output": "Debe verificar pandas, pedir confirmación de columnas, validar duplicados por CI, insertar con reporte final.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "me mandaron un csv con todas las casas comunales, son como 45. está en C:/Users/KEVIN/Downloads/casas.csv",
+      "expected_output": "Debe detectar que es CSV, leer columnas, mapearlas a la tabla casas_comunales, validar e insertar.",
+      "files": []
+    }
+  ]
+}
