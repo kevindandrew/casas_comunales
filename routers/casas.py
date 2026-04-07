@@ -64,7 +64,9 @@ def horarios_casa(casa_id: int, db: Session = Depends(get_db), _=Depends(get_cur
 
 @router.post("/{casa_id}/horarios", response_model=HorarioRead, status_code=201)
 def crear_horario(casa_id: int, data: HorarioCreate, db: Session = Depends(get_db), _=Depends(require_admin)):
-    horario = Horario(**data.model_dump(), casa_comunal_id=casa_id)
+    data_dict = data.model_dump()
+    data_dict["casa_comunal_id"] = casa_id
+    horario = Horario(**data_dict)
     db.add(horario)
     db.commit()
     db.refresh(horario)
