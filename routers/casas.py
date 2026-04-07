@@ -6,7 +6,7 @@ from models.casa_comunal import CasaComunal
 from models.gestion import GestionCasa
 from models.horario import Horario
 from schemas.casa_comunal import CasaComunalCreate, CasaComunalRead
-from schemas.horario import HorarioCreate, HorarioRead
+from schemas.horario import HorarioCreate, HorarioRead, HorarioUpdate
 from security import get_current_user, require_admin
 
 router = APIRouter(prefix="/casas", tags=["Casas Comunales"])
@@ -71,3 +71,35 @@ def crear_horario(casa_id: int, data: HorarioCreate, db: Session = Depends(get_d
     db.commit()
     db.refresh(horario)
     return horario
+
+
+@router.put("/{casa_id}/horarios/{horario_id}", response_model=HorarioRead)
+def actualizar_horario(
+    casa_id: int,
+    horario_id: int,
+    data: HorarioUpdate,
+    db: Session = Depends(get_db),
+    _=Depends(require_admin),
+):
+    horario = db.query(Horario).filter(Horario.id == horario_id, Horario.casa_comunal_id == casa_id).first()
+    if not horario:
+        raise HTTPException(status_code=404, detail="Horario no encontrado")
+    for field, value in data.model_dump(exclude_none=True).items():
+        setattr(horario, field, value)
+    db.commit()
+    db.refresh(horario)
+    return horario
+
+
+@router.delete("/{casa_id}/horarios/{horario_id}", status_code=204)
+def eliminar_horario(
+    casa_id: int,
+    horario_id: int,
+    db: Session = Depends(get_db),
+    _=Depends(require_admin),
+):
+    horario = db.query(Horario).filter(Horario.id == horario_id, Horario.casa_comunal_id == casa_id).first()
+    if not horario:
+        raise HTTPException(status_code=404, detail="Horario no encontrado")
+    db.delete(horario)
+    db.commit()
