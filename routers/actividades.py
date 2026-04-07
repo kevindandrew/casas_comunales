@@ -14,12 +14,15 @@ router = APIRouter(prefix="/actividades", tags=["Actividades"])
 @router.get("", response_model=List[ActividadRead])
 def listar_actividades(
     es_global: Optional[bool] = Query(None),
+    gestion_id: Optional[int] = Query(None),
     db: Session = Depends(get_db),
     _=Depends(get_current_user),
 ):
     query = db.query(Actividad)
     if es_global is not None:
         query = query.filter(Actividad.es_global == es_global)
+    if gestion_id is not None:
+        query = query.filter(Actividad.gestion_id == gestion_id)
     return query.order_by(Actividad.fecha.desc()).all()
 
 
@@ -31,6 +34,7 @@ def crear_actividad(data: ActividadCreate, db: Session = Depends(get_db), _=Depe
         fecha=data.fecha,
         es_global=data.es_global,
         facilitador_responsable_id=data.facilitador_responsable_id,
+        gestion_id=data.gestion_id,
     )
     db.add(actividad)
     db.flush()  # Para obtener el id antes del commit

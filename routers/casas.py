@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 from database import get_db
 from models.casa_comunal import CasaComunal
+from models.gestion import GestionCasa
 from models.horario import Horario
 from schemas.casa_comunal import CasaComunalCreate, CasaComunalRead
 from schemas.horario import HorarioCreate, HorarioRead
@@ -14,10 +15,14 @@ router = APIRouter(prefix="/casas", tags=["Casas Comunales"])
 @router.get("", response_model=List[CasaComunalRead])
 def listar_casas(
     macrodistrito: Optional[str] = Query(None),
+    gestion_id: Optional[int] = Query(None),
     db: Session = Depends(get_db),
     _=Depends(get_current_user),
 ):
     query = db.query(CasaComunal)
+    if gestion_id:
+        query = query.join(GestionCasa, GestionCasa.casa_comunal_id == CasaComunal.id)\
+                     .filter(GestionCasa.gestion_id == gestion_id)
     if macrodistrito:
         query = query.filter(CasaComunal.macrodistrito.ilike(f"%{macrodistrito}%"))
     return query.all()

@@ -9,6 +9,7 @@ class ActividadCreate(BaseModel):
     fecha: date
     es_global: bool = False
     facilitador_responsable_id: Optional[int] = None
+    gestion_id: Optional[int] = None
     casa_ids: List[int] = []  # Casas donde aplica (si no es global)
 
 
@@ -21,6 +22,7 @@ class ActividadRead(BaseModel):
     fecha: date
     es_global: bool
     facilitador_responsable_id: Optional[int] = None
+    gestion_id: Optional[int] = None
 
 
 class AsistenciaActividadCreate(BaseModel):

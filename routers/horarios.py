@@ -16,18 +16,21 @@ DIAS = {1: "Lunes", 2: "Martes", 3: "Miércoles", 4: "Jueves", 5: "Viernes"}
 def grilla_horarios(
     dia_semana: Optional[int] = Query(None, ge=1, le=5, description="1=Lunes, 5=Viernes"),
     macrodistrito: Optional[str] = Query(None),
+    gestion_id: Optional[int] = Query(None),
     db: Session = Depends(get_db),
     _=Depends(get_current_user),
 ):
     """
     Vista grilla semanal: devuelve TODOS los horarios con datos de casa y facilitador.
-    Filtrable por día y/o macrodistrito.
+    Filtrable por día, macrodistrito y/o gestión.
     """
     query = (
         db.query(Horario)
         .join(CasaComunal, Horario.casa_comunal_id == CasaComunal.id, isouter=True)
     )
 
+    if gestion_id is not None:
+        query = query.filter(Horario.gestion_id == gestion_id)
     if dia_semana is not None:
         query = query.filter(Horario.dia_semana == dia_semana)
     if macrodistrito:

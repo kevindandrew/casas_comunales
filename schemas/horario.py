@@ -9,6 +9,7 @@ class HorarioCreate(BaseModel):
     dia_semana: int  # 1=Lunes ... 5=Viernes
     hora_inicio: time
     hora_fin: time
+    gestion_id: Optional[int] = None
 
 
 class HorarioRead(BaseModel):
@@ -20,6 +21,7 @@ class HorarioRead(BaseModel):
     dia_semana: int
     hora_inicio: time
     hora_fin: time
+    gestion_id: Optional[int] = None
 
 
 class HorarioGrilla(BaseModel):
