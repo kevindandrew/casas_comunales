@@ -11,11 +11,12 @@ class Taller(Base):
     descripcion = Column(Text, nullable=True)
     casa_comunal_id = Column(Integer, ForeignKey("casas_comunales.id"), nullable=True)
     facilitador_id = Column(Integer, ForeignKey("usuarios.id"), nullable=True)
-    gestion_anio = Column(Integer, default=2026)
+    gestion_id = Column(Integer, ForeignKey("gestiones.id"), nullable=True)
     activo = Column(Boolean, default=True)
 
     casa_comunal = relationship("CasaComunal", back_populates="talleres")
     facilitador = relationship("Usuario", back_populates="talleres_facilitados")
+    gestion = relationship("Gestion", back_populates="talleres")
     inscripciones = relationship("InscripcionTaller", back_populates="taller")
     asistencias = relationship("AsistenciaParticipante", back_populates="taller")
     evaluaciones = relationship("Evaluacion", back_populates="taller")

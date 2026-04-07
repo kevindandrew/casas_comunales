@@ -12,8 +12,10 @@ class Actividad(Base):
     fecha = Column(Date, nullable=False)
     es_global = Column(Boolean, default=False)
     facilitador_responsable_id = Column(Integer, ForeignKey("usuarios.id"), nullable=True)
+    gestion_id = Column(Integer, ForeignKey("gestiones.id"), nullable=True)
 
     facilitador_responsable = relationship("Usuario", back_populates="actividades_responsable")
+    gestion = relationship("Gestion", back_populates="actividades")
     actividad_casas = relationship("ActividadCasa", back_populates="actividad")
     asistencias = relationship("AsistenciaParticipante", back_populates="actividad")
 

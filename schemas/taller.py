@@ -8,7 +8,7 @@ class TallerCreate(BaseModel):
     descripcion: Optional[str] = None
     casa_comunal_id: Optional[int] = None
     facilitador_id: Optional[int] = None
-    gestion_anio: Optional[int] = 2026
+    gestion_id: Optional[int] = None
 
 
 class TallerRead(BaseModel):
@@ -19,7 +19,7 @@ class TallerRead(BaseModel):
     descripcion: Optional[str] = None
     casa_comunal_id: Optional[int] = None
     facilitador_id: Optional[int] = None
-    gestion_anio: Optional[int] = None
+    gestion_id: Optional[int] = None
     activo: bool
 
 
@@ -27,7 +27,7 @@ class TallerUpdate(BaseModel):
     nombre: Optional[str] = None
     descripcion: Optional[str] = None
     facilitador_id: Optional[int] = None
-    gestion_anio: Optional[int] = None
+    gestion_id: Optional[int] = None
 
 
 class InscripcionCreate(BaseModel):

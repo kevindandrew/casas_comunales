@@ -1,6 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
 from database import get_db
 from models.taller import Taller, InscripcionTaller
 from models.participante import Participante
@@ -14,8 +14,14 @@ router = APIRouter(prefix="/talleres", tags=["Talleres"])
 
 
 @router.get("", response_model=List[TallerRead])
-def listar_talleres(db: Session = Depends(get_db), current_user: Usuario = Depends(get_current_user)):
+def listar_talleres(
+    gestion_id: Optional[int] = Query(None),
+    db: Session = Depends(get_db),
+    current_user: Usuario = Depends(get_current_user),
+):
     query = db.query(Taller).filter(Taller.activo == True)
+    if gestion_id:
+        query = query.filter(Taller.gestion_id == gestion_id)
     if current_user.rol.value == "Facilitador":
         query = query.filter(Taller.facilitador_id == current_user.id)
     return query.all()

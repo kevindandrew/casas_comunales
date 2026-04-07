@@ -21,3 +21,4 @@ class CasaComunal(Base):
     talleres = relationship("Taller", back_populates="casa_comunal")
     horarios = relationship("Horario", back_populates="casa_comunal")
     actividad_casas = relationship("ActividadCasa", back_populates="casa_comunal")
+    gestion_casas = relationship("GestionCasa", back_populates="casa_comunal")

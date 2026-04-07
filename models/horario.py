@@ -12,8 +12,10 @@ class Horario(Base):
     dia_semana = Column(Integer, nullable=False)  # 1=Lunes, 5=Viernes
     hora_inicio = Column(Time, nullable=False)
     hora_fin = Column(Time, nullable=False)
+    gestion_id = Column(Integer, ForeignKey("gestiones.id"), nullable=True)
 
     __table_args__ = (CheckConstraint("dia_semana BETWEEN 1 AND 5", name="ck_dia_semana"),)
 
     casa_comunal = relationship("CasaComunal", back_populates="horarios")
     facilitador = relationship("Usuario", back_populates="horarios")
+    gestion = relationship("Gestion", back_populates="horarios")
