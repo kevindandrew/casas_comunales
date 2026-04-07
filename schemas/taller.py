@@ -6,9 +6,6 @@ from typing import Optional
 class TallerCreate(BaseModel):
     nombre: str
     descripcion: Optional[str] = None
-    casa_comunal_id: Optional[int] = None
-    facilitador_id: Optional[int] = None
-    gestion_id: Optional[int] = None
 
 
 class TallerRead(BaseModel):
@@ -17,17 +14,12 @@ class TallerRead(BaseModel):
     id: int
     nombre: str
     descripcion: Optional[str] = None
-    casa_comunal_id: Optional[int] = None
-    facilitador_id: Optional[int] = None
-    gestion_id: Optional[int] = None
     activo: bool
 
 
 class TallerUpdate(BaseModel):
     nombre: Optional[str] = None
     descripcion: Optional[str] = None
-    facilitador_id: Optional[int] = None
-    gestion_id: Optional[int] = None
 
 
 class InscripcionCreate(BaseModel):

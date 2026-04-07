@@ -50,6 +50,8 @@ def grilla_horarios(
             macrodistrito=h.casa_comunal.macrodistrito if h.casa_comunal else None,
             facilitador_id=h.facilitador_id,
             facilitador_nombre=h.facilitador.nombre_completo if h.facilitador else None,
+            taller_id=h.taller_id,
+            taller_nombre=h.taller.nombre if h.taller else None,
         )
         for h in horarios
     ]

@@ -15,16 +15,10 @@ router = APIRouter(prefix="/talleres", tags=["Talleres"])
 
 @router.get("", response_model=List[TallerRead])
 def listar_talleres(
-    gestion_id: Optional[int] = Query(None),
     db: Session = Depends(get_db),
-    current_user: Usuario = Depends(get_current_user),
+    _=Depends(get_current_user),
 ):
-    query = db.query(Taller).filter(Taller.activo == True)
-    if gestion_id:
-        query = query.filter(Taller.gestion_id == gestion_id)
-    if current_user.rol.value == "Facilitador":
-        query = query.filter(Taller.facilitador_id == current_user.id)
-    return query.all()
+    return db.query(Taller).filter(Taller.activo == True).all()
 
 
 @router.post("", response_model=TallerRead, status_code=201)

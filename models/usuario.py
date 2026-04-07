@@ -25,7 +25,6 @@ class Usuario(Base):
     casa_comunal_id = Column(Integer, ForeignKey("casas_comunales.id"), nullable=True)
 
     casa_comunal = relationship("CasaComunal", back_populates="usuarios")
-    talleres_facilitados = relationship("Taller", back_populates="facilitador")
     horarios = relationship("Horario", back_populates="facilitador")
     control_asistencia = relationship("ControlFacilitador", back_populates="facilitador")
     documentos = relationship("DocumentoFacilitador", back_populates="facilitador")

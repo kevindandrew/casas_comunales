@@ -6,6 +6,7 @@ from typing import Optional
 class HorarioCreate(BaseModel):
     casa_comunal_id: Optional[int] = None
     facilitador_id: Optional[int] = None
+    taller_id: Optional[int] = None
     dia_semana: int  # 1=Lunes ... 5=Viernes
     hora_inicio: time
     hora_fin: time
@@ -18,6 +19,7 @@ class HorarioRead(BaseModel):
     id: int
     casa_comunal_id: Optional[int] = None
     facilitador_id: Optional[int] = None
+    taller_id: Optional[int] = None
     dia_semana: int
     hora_inicio: time
     hora_fin: time
@@ -28,7 +30,7 @@ class HorarioGrilla(BaseModel):
     """Schema enriquecido para la vista de grilla semanal del frontend."""
     id: int
     dia_semana: int
-    dia_nombre: str          # "Lunes", "Martes", etc.
+    dia_nombre: str
     hora_inicio: time
     hora_fin: time
     casa_id: Optional[int] = None
@@ -36,3 +38,5 @@ class HorarioGrilla(BaseModel):
     macrodistrito: Optional[str] = None
     facilitador_id: Optional[int] = None
     facilitador_nombre: Optional[str] = None
+    taller_id: Optional[int] = None
+    taller_nombre: Optional[str] = None

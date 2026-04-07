@@ -19,7 +19,6 @@ class Gestion(Base):
         CheckConstraint("trimestre IN (1, 2, 3)", name="ck_trimestre"),
     )
 
-    talleres = relationship("Taller", back_populates="gestion")
     horarios = relationship("Horario", back_populates="gestion")
     actividades = relationship("Actividad", back_populates="gestion")
     gestion_casas = relationship("GestionCasa", back_populates="gestion")
