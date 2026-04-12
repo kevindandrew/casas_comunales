@@ -9,7 +9,7 @@ import os
 
 SECRET_KEY = os.getenv("SECRET_KEY", "changeme-super-secret")
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 8  # 8 horas
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 24 horas (1 dia)
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 bearer_scheme = HTTPBearer()
