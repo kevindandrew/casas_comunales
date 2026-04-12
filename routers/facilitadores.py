@@ -37,15 +37,15 @@ def _haversine(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
 def check_in(
     latitud: float = Form(...),
     longitud: float = Form(...),
+    casa_comunal_id: int = Form(...),
     foto: UploadFile = File(...),
     db: Session = Depends(get_db),
     current_user: Usuario = Depends(get_current_user),
 ):
-    if not current_user.casa_comunal_id:
-        raise HTTPException(status_code=400, detail="El facilitador no tiene una casa comunal asignada")
-
-    casa = db.query(CasaComunal).filter(CasaComunal.id == current_user.casa_comunal_id).first()
-    if not casa or casa.latitud is None or casa.longitud is None:
+    casa = db.query(CasaComunal).filter(CasaComunal.id == casa_comunal_id).first()
+    if not casa:
+        raise HTTPException(status_code=404, detail="Casa comunal no encontrada")
+    if casa.latitud is None or casa.longitud is None:
         raise HTTPException(status_code=400, detail="La casa comunal no tiene coordenadas GPS registradas")
 
     # Validar proximidad GPS
