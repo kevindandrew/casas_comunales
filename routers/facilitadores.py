@@ -1,5 +1,5 @@
 import math
-from datetime import date, datetime
+from datetime import date, datetime, timezone, timedelta
 from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File, Form
 from sqlalchemy.orm import Session
 from typing import List, Optional
@@ -20,6 +20,7 @@ router = APIRouter(prefix="/facilitadores", tags=["Facilitadores"])
 from cloudinary_config import subir_archivo
 
 RADIO_PERMITIDO_METROS = 100
+LA_PAZ = timezone(timedelta(hours=-4))
 
 
 def _haversine(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
@@ -32,7 +33,7 @@ def _haversine(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     return 2 * R * math.atan2(math.sqrt(a), math.sqrt(1 - a))
 
 
-@router.post("/check-in")
+@router.post("/check-in", response_model=ControlFacilitadorRead)
 def check_in(
     latitud: float = Form(...),
     longitud: float = Form(...),
@@ -55,45 +56,28 @@ def check_in(
             detail=f"Estás a {distancia:.0f}m de la casa comunal. Máximo permitido: {RADIO_PERMITIDO_METROS}m"
         )
 
-    # Validar coincidencia con horario del día (1=Lunes ... 5=Viernes, Python: 0=Lunes)
-    dia_hoy = datetime.today().weekday() + 1  # Convertir a 1-5
-    tiene_horario_hoy = db.query(Horario).filter(
-        Horario.facilitador_id == current_user.id,
-        Horario.casa_comunal_id == current_user.casa_comunal_id,
-        Horario.dia_semana == dia_hoy,
-    ).first()
-    # Si no tiene horario hoy, se registra pero queda como no validado (no bloquea el flujo)
-    validado_auto = tiene_horario_hoy is not None
+    now_utc = datetime.now(timezone.utc)
+    fecha_bolivia = datetime.now(LA_PAZ).date()
 
     # Guardar foto en Cloudinary
-    foto_url = subir_archivo(foto.file, carpeta="casas_comunales/fotos_checkin", public_id=f"entrada_{current_user.id}_{date.today()}")
+    foto_url = subir_archivo(foto.file, carpeta="casas_comunales/fotos_checkin", public_id=f"entrada_{current_user.id}_{fecha_bolivia}")
 
     control = ControlFacilitador(
         facilitador_id=current_user.id,
-        fecha=date.today(),
-        hora_entrada=datetime.now().time(),
+        fecha=fecha_bolivia,
+        hora_entrada=now_utc.time(),
         latitud_entrada=latitud,
         longitud_entrada=longitud,
         foto_entrada_url=foto_url,
-        validado=validado_auto,
+        validado=None,
     )
     db.add(control)
     db.commit()
     db.refresh(control)
-
-    mensaje = f"Check-in registrado. Distancia: {distancia:.0f}m."
-    if not validado_auto:
-        mensaje += " AVISO: No tienes horario asignado para hoy. Pendiente de validación por administrador."
-
-    return {
-        "status": "success" if validado_auto else "pendiente",
-        "mensaje": mensaje,
-        "control_id": control.id,
-        "validado": validado_auto,
-    }
+    return control
 
 
-@router.post("/check-out")
+@router.post("/check-out", response_model=ControlFacilitadorRead)
 def check_out(
     control_id: int = Form(...),
     foto: UploadFile = File(...),
@@ -109,12 +93,14 @@ def check_out(
     if control.hora_salida:
         raise HTTPException(status_code=400, detail="Ya se registró el check-out para este turno")
 
-    foto_url = subir_archivo(foto.file, carpeta="casas_comunales/fotos_checkin", public_id=f"salida_{current_user.id}_{date.today()}")
+    fecha_bolivia = datetime.now(LA_PAZ).date()
+    foto_url = subir_archivo(foto.file, carpeta="casas_comunales/fotos_checkin", public_id=f"salida_{current_user.id}_{fecha_bolivia}")
 
-    control.hora_salida = datetime.now().time()
+    control.hora_salida = datetime.now(timezone.utc).time()
     control.foto_salida_url = foto_url
     db.commit()
-    return {"status": "success", "mensaje": "Check-out registrado correctamente"}
+    db.refresh(control)
+    return control
 
 
 # ─── Control Admin ────────────────────────────────────────────────────────────

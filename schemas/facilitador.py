@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, field_serializer
 from datetime import date, time
 from typing import Optional
 from decimal import Decimal
@@ -25,7 +25,13 @@ class ControlFacilitadorRead(BaseModel):
     longitud_entrada: Optional[Decimal] = None
     foto_entrada_url: Optional[str] = None
     foto_salida_url: Optional[str] = None
-    validado: bool
+    validado: Optional[bool] = None
+
+    @field_serializer("hora_entrada", "hora_salida")
+    def _fmt_hora_utc(self, v: Optional[time]) -> Optional[str]:
+        if v is None:
+            return None
+        return v.strftime("%H:%M:%S") + "Z"
 
 
 class DocumentoCreate(BaseModel):
