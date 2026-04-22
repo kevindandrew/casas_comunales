@@ -11,6 +11,7 @@ from models.horario import Horario
 from models.usuario import Usuario
 from schemas.facilitador import (
     CheckInCreate, CheckOutCreate, ControlFacilitadorRead,
+    ControlAdminCreate, ControlAdminUpdate,
     DocumentoEstadoUpdate, DocumentoRead, ValidarControlRequest,
 )
 from security import get_current_user, require_admin
@@ -125,6 +126,56 @@ def listar_controles(
     if validado is not None:
         query = query.filter(ControlFacilitador.validado == validado)
     return query.order_by(ControlFacilitador.fecha.desc()).all()
+
+
+@router.post("/control", response_model=ControlFacilitadorRead, status_code=201)
+def crear_control_admin(
+    data: ControlAdminCreate,
+    db: Session = Depends(get_db),
+    _=Depends(require_admin),
+):
+    """Admin crea un registro de asistencia manual para un facilitador."""
+    facilitador = db.query(Usuario).filter(Usuario.id == data.facilitador_id).first()
+    if not facilitador:
+        raise HTTPException(status_code=404, detail="Facilitador no encontrado")
+
+    control = ControlFacilitador(
+        facilitador_id=data.facilitador_id,
+        fecha=data.fecha,
+        hora_entrada=data.hora_entrada,
+        hora_salida=data.hora_salida,
+        latitud_entrada=data.latitud_entrada,
+        longitud_entrada=data.longitud_entrada,
+        validado=None,
+    )
+    db.add(control)
+    db.commit()
+    db.refresh(control)
+    return control
+
+
+@router.patch("/control/{control_id}", response_model=ControlFacilitadorRead)
+def editar_control_admin(
+    control_id: int,
+    data: ControlAdminUpdate,
+    db: Session = Depends(get_db),
+    _=Depends(require_admin),
+):
+    """Admin corrige fecha u hora de entrada/salida de un registro existente."""
+    control = db.query(ControlFacilitador).filter(ControlFacilitador.id == control_id).first()
+    if not control:
+        raise HTTPException(status_code=404, detail="Registro no encontrado")
+
+    if data.fecha is not None:
+        control.fecha = data.fecha
+    if data.hora_entrada is not None:
+        control.hora_entrada = data.hora_entrada
+    if data.hora_salida is not None:
+        control.hora_salida = data.hora_salida
+
+    db.commit()
+    db.refresh(control)
+    return control
 
 
 @router.patch("/control/{control_id}/validar", response_model=ControlFacilitadorRead)

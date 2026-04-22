@@ -34,6 +34,21 @@ class ControlFacilitadorRead(BaseModel):
         return v.strftime("%H:%M:%S") + "Z"
 
 
+class ControlAdminCreate(BaseModel):
+    facilitador_id: int
+    fecha: date
+    hora_entrada: time
+    hora_salida: Optional[time] = None
+    latitud_entrada: Optional[Decimal] = None
+    longitud_entrada: Optional[Decimal] = None
+
+
+class ControlAdminUpdate(BaseModel):
+    fecha: Optional[date] = None
+    hora_entrada: Optional[time] = None
+    hora_salida: Optional[time] = None
+
+
 class DocumentoCreate(BaseModel):
     tipo_documento: Optional[str] = None
 
