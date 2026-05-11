@@ -7,12 +7,14 @@ from database import get_db
 from models.control_facilitador import ControlFacilitador
 from models.documento import DocumentoFacilitador, EstadoDoc
 from models.casa_comunal import CasaComunal
+from models.registro_actividad import RegistroActividad, TipoActividad
 from models.horario import Horario
 from models.usuario import Usuario
 from schemas.facilitador import (
     CheckInCreate, CheckOutCreate, ControlFacilitadorRead,
     ControlAdminCreate, ControlAdminUpdate,
     DocumentoEstadoUpdate, DocumentoRead, ValidarControlRequest,
+    RegistroActividadCreate, RegistroActividadRead,
 )
 from security import get_current_user, require_admin
 
@@ -40,6 +42,7 @@ def check_in(
     longitud: float = Form(...),
     casa_comunal_id: int = Form(...),
     foto: UploadFile = File(...),
+    descripcion: Optional[str] = Form(None),
     db: Session = Depends(get_db),
     current_user: Usuario = Depends(get_current_user),
 ):
@@ -70,6 +73,7 @@ def check_in(
         latitud_entrada=latitud,
         longitud_entrada=longitud,
         foto_entrada_url=foto_url,
+        descripcion=descripcion,
         validado=None,
     )
     db.add(control)
@@ -193,6 +197,111 @@ def validar_control(
     db.commit()
     db.refresh(control)
     return control
+
+
+# ─── Registro de Actividades ─────────────────────────────────────────────────
+
+@router.post("/actividades", response_model=RegistroActividadRead, status_code=201)
+def registrar_actividad(
+    data: RegistroActividadCreate,
+    db: Session = Depends(get_db),
+    current_user: Usuario = Depends(get_current_user),
+):
+    """Registra una actividad o trabajo del facilitador sin restricción GPS."""
+    try:
+        tipo = TipoActividad(data.tipo_actividad)
+    except ValueError:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Tipo de actividad inválido. Opciones: {[t.value for t in TipoActividad]}"
+        )
+
+    if data.casa_comunal_id:
+        casa = db.query(CasaComunal).filter(CasaComunal.id == data.casa_comunal_id).first()
+        if not casa:
+            raise HTTPException(status_code=404, detail="Casa comunal no encontrada")
+
+    registro = RegistroActividad(
+        facilitador_id=current_user.id,
+        fecha=data.fecha,
+        hora_inicio=data.hora_inicio,
+        hora_fin=data.hora_fin,
+        tipo_actividad=tipo,
+        descripcion=data.descripcion,
+        casa_comunal_id=data.casa_comunal_id,
+    )
+    db.add(registro)
+    db.commit()
+    db.refresh(registro)
+    return registro
+
+
+@router.get("/actividades", response_model=List[RegistroActividadRead])
+def listar_actividades(
+    facilitador_id: Optional[int] = Query(None),
+    fecha: Optional[date] = Query(None),
+    db: Session = Depends(get_db),
+    current_user: Usuario = Depends(get_current_user),
+):
+    """Lista actividades. Admin ve todas; facilitador solo las suyas."""
+    query = db.query(RegistroActividad)
+    if current_user.rol.value == "Facilitador":
+        query = query.filter(RegistroActividad.facilitador_id == current_user.id)
+    else:
+        if facilitador_id:
+            query = query.filter(RegistroActividad.facilitador_id == facilitador_id)
+    if fecha:
+        query = query.filter(RegistroActividad.fecha == fecha)
+    return query.order_by(RegistroActividad.fecha.desc()).all()
+
+
+@router.patch("/actividades/{actividad_id}", response_model=RegistroActividadRead)
+def editar_actividad(
+    actividad_id: int,
+    data: RegistroActividadCreate,
+    db: Session = Depends(get_db),
+    current_user: Usuario = Depends(get_current_user),
+):
+    """El facilitador puede editar su propio registro de actividad."""
+    registro = db.query(RegistroActividad).filter(RegistroActividad.id == actividad_id).first()
+    if not registro:
+        raise HTTPException(status_code=404, detail="Registro no encontrado")
+    if current_user.rol.value == "Facilitador" and registro.facilitador_id != current_user.id:
+        raise HTTPException(status_code=403, detail="No tienes permiso para editar este registro")
+
+    try:
+        tipo = TipoActividad(data.tipo_actividad)
+    except ValueError:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Tipo de actividad inválido. Opciones: {[t.value for t in TipoActividad]}"
+        )
+
+    registro.fecha = data.fecha
+    registro.hora_inicio = data.hora_inicio
+    registro.hora_fin = data.hora_fin
+    registro.tipo_actividad = tipo
+    registro.descripcion = data.descripcion
+    registro.casa_comunal_id = data.casa_comunal_id
+    db.commit()
+    db.refresh(registro)
+    return registro
+
+
+@router.delete("/actividades/{actividad_id}", status_code=204)
+def eliminar_actividad(
+    actividad_id: int,
+    db: Session = Depends(get_db),
+    current_user: Usuario = Depends(get_current_user),
+):
+    """El facilitador puede eliminar su propio registro; admin puede eliminar cualquiera."""
+    registro = db.query(RegistroActividad).filter(RegistroActividad.id == actividad_id).first()
+    if not registro:
+        raise HTTPException(status_code=404, detail="Registro no encontrado")
+    if current_user.rol.value == "Facilitador" and registro.facilitador_id != current_user.id:
+        raise HTTPException(status_code=403, detail="No tienes permiso para eliminar este registro")
+    db.delete(registro)
+    db.commit()
 
 
 # ─── Documentos ───────────────────────────────────────────────────────────────

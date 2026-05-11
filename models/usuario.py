@@ -29,3 +29,4 @@ class Usuario(Base):
     control_asistencia = relationship("ControlFacilitador", back_populates="facilitador")
     documentos = relationship("DocumentoFacilitador", back_populates="facilitador")
     actividades_responsable = relationship("Actividad", back_populates="facilitador_responsable")
+    registro_actividades = relationship("RegistroActividad", back_populates="facilitador")

@@ -16,5 +16,6 @@ class ControlFacilitador(Base):
     foto_entrada_url = Column(Text, nullable=True)
     foto_salida_url = Column(Text, nullable=True)
     validado = Column(Boolean, default=False)
+    descripcion = Column(Text, nullable=True)
 
     facilitador = relationship("Usuario", back_populates="control_asistencia")

@@ -21,3 +21,4 @@ class CasaComunal(Base):
     horarios = relationship("Horario", back_populates="casa_comunal")
     actividad_casas = relationship("ActividadCasa", back_populates="casa_comunal")
     gestion_casas = relationship("GestionCasa", back_populates="casa_comunal")
+    registro_actividades = relationship("RegistroActividad", back_populates="casa_comunal")

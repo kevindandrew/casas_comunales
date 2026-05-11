@@ -7,6 +7,7 @@ from decimal import Decimal
 class CheckInCreate(BaseModel):
     latitud: Decimal
     longitud: Decimal
+    descripcion: Optional[str] = None
 
 
 class CheckOutCreate(BaseModel):
@@ -26,6 +27,7 @@ class ControlFacilitadorRead(BaseModel):
     foto_entrada_url: Optional[str] = None
     foto_salida_url: Optional[str] = None
     validado: Optional[bool] = None
+    descripcion: Optional[str] = None
 
     @field_serializer("hora_entrada", "hora_salida")
     def _fmt_hora_utc(self, v: Optional[time]) -> Optional[str]:
@@ -72,3 +74,31 @@ class DocumentoRead(BaseModel):
     url_archivo: str
     estado: str
     observaciones: Optional[str] = None
+
+
+class RegistroActividadCreate(BaseModel):
+    fecha: date
+    hora_inicio: time
+    hora_fin: Optional[time] = None
+    tipo_actividad: str
+    descripcion: str
+    casa_comunal_id: Optional[int] = None
+
+
+class RegistroActividadRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    facilitador_id: int
+    fecha: date
+    hora_inicio: time
+    hora_fin: Optional[time] = None
+    tipo_actividad: str
+    descripcion: str
+    casa_comunal_id: Optional[int] = None
+
+    @field_serializer("hora_inicio", "hora_fin")
+    def _fmt_hora(self, v: Optional[time]) -> Optional[str]:
+        if v is None:
+            return None
+        return v.strftime("%H:%M:%S")
