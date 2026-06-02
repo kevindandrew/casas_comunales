@@ -9,3 +9,4 @@ from models.asistencia import AsistenciaParticipante, Evaluacion
 from models.control_facilitador import ControlFacilitador
 from models.documento import DocumentoFacilitador, EstadoDoc
 from models.registro_actividad import RegistroActividad, TipoActividad
+from models.informe_mensual import InformeMensual

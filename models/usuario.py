@@ -30,3 +30,4 @@ class Usuario(Base):
     documentos = relationship("DocumentoFacilitador", back_populates="facilitador")
     actividades_responsable = relationship("Actividad", back_populates="facilitador_responsable")
     registro_actividades = relationship("RegistroActividad", back_populates="facilitador")
+    informes_mensuales = relationship("InformeMensual", back_populates="facilitador")

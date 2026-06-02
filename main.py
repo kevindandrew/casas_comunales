@@ -7,7 +7,7 @@ import models  # Registra todos los modelos con SQLAlchemy
 from routers import (
     auth, usuarios, casas, horarios,
     talleres, participantes, control,
-    facilitadores, actividades, reportes, gestiones,
+    facilitadores, actividades, reportes, gestiones, informes,
 )
 
 app = FastAPI(
@@ -43,6 +43,7 @@ app.include_router(facilitadores.router)
 app.include_router(actividades.router)
 app.include_router(reportes.router)
 app.include_router(gestiones.router)
+app.include_router(informes.router)
 
 
 @app.get("/", tags=["Root"])
