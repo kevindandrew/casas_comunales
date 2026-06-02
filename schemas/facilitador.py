@@ -85,6 +85,16 @@ class RegistroActividadCreate(BaseModel):
     casa_comunal_id: Optional[int] = None
 
 
+class RegistroActividadAdminCreate(BaseModel):
+    facilitador_id: int
+    fecha: date
+    hora_inicio: time
+    hora_fin: Optional[time] = None
+    tipo_actividad: str
+    descripcion: str
+    casa_comunal_id: Optional[int] = None
+
+
 class RegistroActividadRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

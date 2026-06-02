@@ -14,7 +14,7 @@ from schemas.facilitador import (
     CheckInCreate, CheckOutCreate, ControlFacilitadorRead,
     ControlAdminCreate, ControlAdminUpdate,
     DocumentoEstadoUpdate, DocumentoRead, ValidarControlRequest,
-    RegistroActividadCreate, RegistroActividadRead,
+    RegistroActividadCreate, RegistroActividadAdminCreate, RegistroActividadRead,
 )
 from security import get_current_user, require_admin
 
@@ -223,6 +223,45 @@ def registrar_actividad(
 
     registro = RegistroActividad(
         facilitador_id=current_user.id,
+        fecha=data.fecha,
+        hora_inicio=data.hora_inicio,
+        hora_fin=data.hora_fin,
+        tipo_actividad=tipo,
+        descripcion=data.descripcion,
+        casa_comunal_id=data.casa_comunal_id,
+    )
+    db.add(registro)
+    db.commit()
+    db.refresh(registro)
+    return registro
+
+
+@router.post("/actividades/admin", response_model=RegistroActividadRead, status_code=201)
+def registrar_actividad_admin(
+    data: RegistroActividadAdminCreate,
+    db: Session = Depends(get_db),
+    _=Depends(require_admin),
+):
+    """Admin crea un registro de actividad para cualquier facilitador."""
+    facilitador = db.query(Usuario).filter(Usuario.id == data.facilitador_id).first()
+    if not facilitador:
+        raise HTTPException(status_code=404, detail="Facilitador no encontrado")
+
+    try:
+        tipo = TipoActividad(data.tipo_actividad)
+    except ValueError:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Tipo de actividad inválido. Opciones: {[t.value for t in TipoActividad]}"
+        )
+
+    if data.casa_comunal_id:
+        casa = db.query(CasaComunal).filter(CasaComunal.id == data.casa_comunal_id).first()
+        if not casa:
+            raise HTTPException(status_code=404, detail="Casa comunal no encontrada")
+
+    registro = RegistroActividad(
+        facilitador_id=data.facilitador_id,
         fecha=data.fecha,
         hora_inicio=data.hora_inicio,
         hora_fin=data.hora_fin,
